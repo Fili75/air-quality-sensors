@@ -5,7 +5,7 @@ from datetime import datetime
 
 st.title("Air quality sensors")
 if ("data" not in st.session_state):
-    d = pd.read_csv("./data/data_CT2.csv",decimal=",")
+    d = pd.read_csv("./data/data_CT2.csv",sep=";")
     d["timestamp"] = pd.to_datetime(d["timestamp"])
     st.session_state["data"] = d
 if "date_min" not in st.session_state:
