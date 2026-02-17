@@ -45,3 +45,4 @@ else:
     ax.legend(labelcolor = "w")
 
 st.plotly_chart(fig)
+st.download_button(label="Download",data=d1.to_csv(index=None,sep=";"),file_name="dati.csv")
