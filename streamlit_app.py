@@ -2,6 +2,20 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+from anthropic import Anthropic
+
+def f_anthropic(data):
+    client = Anthropic(api_key=st.secrets["API_TOKEN"])
+    data_string = data.to_string()
+    prompt = st.secrets["PROMPT"].format(data_string)
+    response = client.messages.create(
+        max_tokens = st.secrets["MAX_TOKENS"],
+        messages = {
+            "role": "user","message": prompt
+        },
+        model = st.secrets["MODEL"]
+    )
+    return response
 
 st.title("Air quality sensors")
 data_input = st.selectbox("Sensore",["CT2", "CT3","CT6","CT8"])
@@ -45,4 +59,11 @@ else:
     ax.legend(labelcolor = "w")
 
 st.plotly_chart(fig)
-st.download_button(label="Download",data=d1.to_csv(index=None,sep=";"),file_name="dati.csv")
+st.download_button(label="Download dei dati",data=st.session_state[f"data_{data_input}"].to_csv(index=None,sep=";"),file_name="data.csv")
+button = st.button(label="Interroga l'intelligenza artificiale")
+if button:
+    try:
+        answer = f_anthropic(st.session_state[f"data_{data_input}"])
+        st.text(answer.content)
+    except Exception:
+        st.error("IA non disponibile! Riprovare")
